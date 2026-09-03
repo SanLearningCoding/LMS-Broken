@@ -52,7 +52,7 @@ rute ini menangani alamat utama (/) dan mengembalikan tampilan (view) dari berka
 hasil sebelum diubah
 ![alt text]()
 
-apabila diubah bagian 'welcome' menjadi 'selamat tinggal'
+apabila diubah bagian 'welcome' menjadi 'selamat datang'
 ```
 Route::get('/', function () {
     return view('selamat datang');
