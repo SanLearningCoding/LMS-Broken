@@ -73,6 +73,20 @@ Bagian ini berfungsi untuk:
    - setelah diubah
   ![alt text](image-3.png)
 
-  4. 
-   - GET|HEAD / = Route::get('/', ...) di baris 5
-   - GET|HEAD tentang = Route::get('/tentang', ...) di baris 9
+4. Hasil php artisan route:list
+  ```  
+  GET|HEAD  / ............................................................................................................................... routes/web.php:5
+  GET|HEAD  storage/{path} ............................... storage.local › vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServiceProvider.php:98
+  PUT       storage/{path} ....................... storage.local.upload › vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServiceProvider.php:106
+  GET|HEAD  tentang ......................................................................................................................... routes/web.php:9
+  GET|HEAD  up ................................................... vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php:219
+  ```
+
+  - yang cocok adalah
+  
+|  Route di web.php | Route di route:list |
+| ------- | ------- |
+| Route::get('/') | GET HEAD / di baris 5 |
+| Route::get('/tentang') | GET HEAD tentang di baris 9  |
+
+
