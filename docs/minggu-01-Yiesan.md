@@ -65,3 +65,14 @@ Bagian ini berfungsi untuk:
 
     Menentukan bagaimana aplikasi merespons berbagai jenis exception
 
+  - 
+
+3. - sebelum diubah
+   ![alt text](image-2.png) 
+
+   - setelah diubah
+  ![alt text](image-3.png)
+
+  4. 
+   - GET|HEAD / = Route::get('/', ...) di baris 5
+   - GET|HEAD tentang = Route::get('/tentang', ...) di baris 9

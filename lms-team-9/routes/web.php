@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('Selamat Datang');
+    return view('welcome');
 });
 
 Route::get('/tentang', function () {
