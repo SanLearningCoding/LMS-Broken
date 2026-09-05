@@ -7,6 +7,6 @@
 </head>
 <body>
     <h1>Selamat Datang di KampusLMS</h1>
-    <p>Proyek Laravel 12 - Kelompok {{ nama_kelompok }}</p>
+    <p>Proyek Laravel 12 - Kelompok 9</p>
 </body>
 </html>
