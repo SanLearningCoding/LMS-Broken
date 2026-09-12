@@ -10,3 +10,6 @@ Route::get('/tentang', function () {
     return view('tentang');
 });
     
+Route::get('/home', function () {
+    return view('home');
+});
