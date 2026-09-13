@@ -8,6 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // 1. Modifikasi Tabel Users
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['admin', 'dosen', 'mahasiswa']);
+            $table->string('nim_nip')->nullable()->unique();
+            $table->softDeletes();
+            $table->index('role');
+        });
+
+        // 2. Tabel Courses
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
@@ -19,6 +28,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // 3. Tabel Pivot Course_User (Enrollment)
         Schema::create('course_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
@@ -28,6 +38,7 @@ return new class extends Migration
             $table->unique(['course_id', 'user_id']);
         });
 
+        // 4. Tabel Materials
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
@@ -44,6 +55,7 @@ return new class extends Migration
             $table->index('course_id');
         });
 
+        // 5. Tabel Assignments
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
@@ -58,6 +70,7 @@ return new class extends Migration
             $table->index(['course_id', 'due_at']);
         });
 
+        // 6. Tabel Submissions
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('assignment_id')->constrained()->cascadeOnDelete();
@@ -72,6 +85,7 @@ return new class extends Migration
             $table->unique(['assignment_id', 'user_id']);
         });
 
+        // 7. Tabel Grades
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->foreignId('submission_id')->constrained()->cascadeOnDelete();
@@ -82,10 +96,21 @@ return new class extends Migration
             $table->timestamps();
             $table->unique('submission_id');
         });
+
+        // 8. Tabel Notifications (Melengkapi total 8 tabel spesifikasi)
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
+            $table->timestamps();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('notifications');
         Schema::dropIfExists('grades');
         Schema::dropIfExists('submissions');
         Schema::dropIfExists('assignments');
@@ -93,5 +118,9 @@ return new class extends Migration
         Schema::dropIfExists('course_user');
         Schema::dropIfExists('courses');
         
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['role', 'nim_nip']);
+            $table->dropSoftDeletes();
+        });
     }
 };
