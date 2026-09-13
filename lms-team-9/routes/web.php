@@ -1,16 +1,11 @@
 <?php
 
+use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome')->name('dashboard');
 
-Route::get('/tentang', function () {
-    return view('tentang');
-});
+Route::get('/mata-kuliah', [CourseController::class, 'index'])->name('courses.index');
+Route::get('/mata-kuliah/{kode}', [CourseController::class, 'show'])->name('courses.show');
 
-Route::get('/home', function () {
-    return view('home');
-});
-    
+Route::view('/tentang', 'tentang')->name('about');
