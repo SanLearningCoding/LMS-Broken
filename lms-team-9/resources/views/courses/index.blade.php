@@ -1,39 +1,51 @@
 <x-layout title="Daftar Mata Kuliah">
-    <h1 class="text-2xl font-bold mb-6">Daftar Mata Kuliah</h1>
-
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-        <table class="min-w-full text-left border-collapse">
-            <thead class="bg-slate-100 text-sm uppercase text-gray-600">
-                <tr>
-                    <th class="px-4 py-3">Kode</th>
-                    <th class="px-4 py-3">Nama Mata Kuliah</th>
-                    <th class="px-4 py-3">SKS</th>
-                    <th class="px-4 py-3">Dosen</th>
-                    <th class="px-4 py-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-                @forelse ($courses as $course)
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3 font-mono text-sm">{{ $course['kode'] }}</td>
-                        <td class="px-4 py-3">{{ $course['nama'] }}</td>
-                        <td class="px-4 py-3">{{ $course['sks'] }}</td>
-                        <td class="px-4 py-3">{{ $course['dosen'] }}</td>
-                        <td class="px-4 py-3">
-                            <a href="{{ route('courses.show', $course['kode']) }}"
-                               class="text-blue-600 hover:underline">
-                                Detail
-                            </a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-6 text-center text-gray-400">
-                            Belum ada data mata kuliah.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <div style="margin-bottom: 1rem;">
+        <h1>Daftar Mata Kuliah</h1>
+        <a href="{{ route('courses.create') }}">+ Tambah Mata Kuliah</a>
     </div>
+
+    @if (session('success'))
+        <div style="color: green; margin-bottom: 1rem;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Kode</th>
+                <th>Nama Mata Kuliah</th>
+                <th>SKS</th>
+                <th>Dosen Pengampu</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($courses as $course)
+                <tr>
+                    <td>{{ $course->code }}</td>
+                    <td>
+                        <a href="{{ route('courses.show', $course) }}">{{ $course->name }}</a>
+                    </td>
+                    <td>{{ $course->sks }}</td>
+                    <td>{{ $course->lecturer ? $course->lecturer->name : 'Belum Ditentukan' }}</td>
+                    <td>{{ ucfirst($course->status) }}</td>
+                    <td>
+                        <a href="{{ route('courses.edit', $course) }}">Edit</a>
+                        |
+                        <form action="{{ route('courses.destroy', $course) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" style="text-align: center;">Belum ada data mata kuliah.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 </x-layout>
