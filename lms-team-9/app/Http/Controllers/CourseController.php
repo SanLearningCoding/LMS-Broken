@@ -2,56 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CourseController extends Controller
 {
-    protected array $courses = [
-        [
-            'kode' => 'SI-251-4007',
-            'nama' => 'Struktur Data',
-            'sks' => 3,
-            'dosen' => 'Dr. Budi Santoso, M.Kom',
-            'deskripsi' => 'Membahas struktur data dasar seperti array, linked list, stack, queue, tree, dan graph beserta analisis kompleksitasnya.',
-        ],
-        [
-            'kode' => 'SI-251-4012',
-            'nama' => 'Pemrograman Lanjut',
-            'sks' => 3,
-            'dosen' => 'Ir. Siti Aminah, M.T.',
-            'deskripsi' => 'Konsep pemrograman berorientasi objek (OOP) menggunakan PHP, meliputi class, inheritance, interface, dan design pattern dasar.',
-        ],
-        [
-            'kode' => 'SI-251-4020',
-            'nama' => 'Rekayasa Perangkat Lunak',
-            'sks' => 3,
-            'dosen' => 'Dr. Ahmad Fauzi, M.Sc',
-            'deskripsi' => 'Proses pengembangan perangkat lunak mulai dari requirement engineering, desain, implementasi, hingga pengujian.',
-        ],
-        [
-            'kode' => 'SI-251-4030',
-            'nama' => 'Keamanan Sistem Informasi',
-            'sks' => 3,
-            'dosen' => 'M. Rizky Pratama, S.Kom., M.T.',
-            'deskripsi' => 'Prinsip keamanan informasi (CIA Triad), audit keamanan, dan penerapan standar seperti ISO 27002 dan Indeks KAMI.',
-        ],
-    ];
-
     public function index(): View
     {
-        return view('courses.index', [
-            'courses' => $this->courses,
-        ]);
+        // Ambil data asli database Vera beserta relasi dosennya
+        $courses = Course::with('lecturer')->latest()->get();
+
+        return view('courses.index', compact('courses'));
     }
 
-    public function show(string $kode): View
+    public function create(): View
     {
-        $course = collect($this->courses)->firstWhere('kode', $kode);
+        // Ambil daftar user ber-role dosen untuk isi dropdown
+        $lecturers = User::where('role', 'dosen')->get();
 
-        abort_if(is_null($course), 404);
+        return view('courses.create', compact('lecturers'));
+    }
 
-        return view('courses.show', [
-            'course' => $course,
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code'        => 'required|string|unique:courses,code',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sks'         => 'required|integer|min:1|max:6',
+            'lecturer_id' => 'required|exists:users,id',
+            'status'      => 'required|in:draft,active,archived',
         ]);
+
+        Course::create($validated);
+
+        return redirect()->route('courses.index')->with('success', 'Mata Kuliah berhasil ditambahkan!');
+    }
+
+    public function show(Course $course): View
+    {
+        $course->load('lecturer');
+
+        return view('courses.show', compact('course'));
+    }
+
+    public function edit(Course $course): View
+    {
+        $lecturers = User::where('role', 'dosen')->get();
+
+        return view('courses.edit', compact('course', 'lecturers'));
+    }
+
+    public function update(Request $request, Course $course): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code'        => 'required|string|unique:courses,code,' . $course->id,
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sks'         => 'required|integer|min:1|max:6',
+            'lecturer_id' => 'required|exists:users,id',
+            'status'      => 'required|in:draft,active,archived',
+        ]);
+
+        $course->update($validated);
+
+        return redirect()->route('courses.index')->with('success', 'Mata Kuliah berhasil diperbarui!');
+    }
+
+    public function destroy(Course $course): RedirectResponse
+    {
+        $course->delete();
+
+        return redirect()->route('courses.index')->with('success', 'Mata Kuliah berhasil dihapus!');
     }
 }
